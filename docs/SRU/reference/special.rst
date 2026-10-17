@@ -3,6 +3,8 @@
 Special types of SRU
 --------------------
 
+.. include:: /SRU/_sru-series.rst
+
 `What is acceptable to SRU <#what-is-acceptable-to-sru>`__, together
 with other considerations, give rise to the following special types of
 permitted SRU, some of which overlap:
@@ -29,7 +31,7 @@ permitted SRU, some of which overlap:
 * **Extended Security Maintenance:** there are special procedures for
   uploads to stable releases in their
   `Extended Security Maintenance (ESM) <https://ubuntu.com/security/esm>`__ period.
-  Please prepare the SRU bug and subscribe the ESM team to it.
+  Please prepare the SRU bug and subscribe the `~ubuntu-esm <https://launchpad.net/~ubuntu-esm>`__ team to it.
 
 * **Staged upload** [:ref:`explanation <explanation-staged-uploads>`],
   [:ref:`how-to: stage upload <howto-stage-upload>`],

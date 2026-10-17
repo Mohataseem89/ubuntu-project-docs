@@ -3,6 +3,8 @@
 Package-specific notes
 ----------------------
 
+.. include:: /SRU/_sru-series.rst
+
 See also: :ref:`Explanation → Non-standard Processes → Package-specific
 non-standard processes <explanation-package-specific-non-standard-processes>`
 
@@ -21,10 +23,10 @@ To obtain a new ongoing exception such as those documented below:
    To discuss further see :ref:`Howto → Contact <howto-contact>`
 
 Note that the SRU team's delegation from the Technical Board is limited
-to accepting SRU uploads that meet the `policy criteria <#When>`__
-above. The SRU team maintains documentation for standing exceptions here
+to accepting SRU uploads that meet the :ref:`policy criteria <reference-what-is-acceptable-to-sru>`.
+The SRU team maintains documentation for standing exceptions here
 to keep individual interpretations of the policy criteria consistent.
-Departing from the policy criteria above still requires approval from
+Departing from the policy criteria still requires approval from
 the Technical Board.
 
 
@@ -39,6 +41,7 @@ the Technical Board.
     exception-Bind9-Updates
     exception-Certbot-Updates
     exception-Cloudinit-Updates
+    exception-CrashMakedumpfile-Updates
     exception-Curtin-Updates
     exception-DPDK-Updates
     exception-Docker-Updates
@@ -610,45 +613,31 @@ tzdata
 ~~~~~~
 
 The tzdata package is updated to reflect changes in timezones or
-daylight saving policies. The verification is done with the "zdump"
-utility. The first timezone that gets changed in the updated package is
-dumped with "zdump -v $region/$timezone_that_changed" (you can find the
-region and timezone name by grep'ing for it in /usr/share/zoneinfo/).
-This is compared to the same output after the updated package was
-installed. If those are different the verification is considered done.
+daylight saving policies. The verification is done by adding a test case to
+`debian/tests/python`. One timezone that gets changed in the updated package
+is checked via the added test case. If the package builds (with running the
+tests) and the autopkgtest are green the verification is considered done.
 
-+---------------+-----------+-----------+-----------+-------+-------+
-| Feature       | 16.04 LTS | 18.04 LTS | 20.04 LTS | 21.04 | 21.10 |
-+===============+===========+===========+===========+=======+=======+
-| icu-data      | No        | No        | Yes       | Yes   | Yes   |
-+---------------+-----------+-----------+-----------+-------+-------+
-| SystemV tzs   | Yes       | Yes       | Yes       | No    | No    |
-+---------------+-----------+-----------+-----------+-------+-------+
++---------------+-----------+-----------+-----------+---------------------+
+| Feature       | 16.04 LTS | 18.04 LTS | 20.04 LTS | 22.04 LTS and later |
++===============+===========+===========+===========+=====================+
+| icu-data      | No        | No        | Yes       | Yes                 |
++---------------+-----------+-----------+-----------+---------------------+
+| SystemV tzs   | Yes       | Yes       | Yes       | No                  |
++---------------+-----------+-----------+-----------+---------------------+
 
 The version of tzdata in Ubuntu 20.04 LTS and later includes icu-data
 (see the update-icu rule in debian/rules) and the verification of it can
-be done after installing the **python3-icu** package. There can be a
+be done by adding a test case to `debian/tests/python-icu` (similar to the
+one in `debian/tests/python`). There can be a
 slight lag between the tzdata release and the matching icu-data release,
 we usually wait for the latter to be released before uploading the
 update.
 
-::
-
-   python3 -c "from datetime import datetime; from icu import ICUtzinfo, TimeZone; tz = ICUtzinfo(TimeZone.createTimeZone('Pacific/Fiji')); print(str(tz.utcoffset(datetime(2020, 11, 10))))"
-
-In the above we are checking a timezone with a change, "Pacific/Fiji",
-and a date that falls with in the changing period. We expect the output
-to be different before (13:00:00) and after (12:00:00) the SRU is
-installed.
-
 The version of tzdata in Ubuntu 20.10 removed supported for SystemV
 timezones, however SRUs of tzdata to Ubuntu 20.04 LTS and earlier
-releases should still include the SystemV timezones. To test that they
-are still available confirm the following command returns nothing.
-
-::
-
-   diff <(zdump -v America/Phoenix | cut -d' ' -f2-) <(zdump -v SystemV/MST7 | cut -d' ' -f2-)
+releases should still include the SystemV timezones. This is tested
+by `test_systemv_timezones` in `debian/tests/python`.
 
 Because tzdata's packaging has changed subtly from release to release,
 rather than just backporting the most recent release's source package,
@@ -761,3 +750,10 @@ Toolchains:
 * Java: `Java updates PPA <https://launchpad.net/~openjdk-r/+archive/ubuntu/ppa>`__
 * Go: `Go updates PPA <https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/golang>`__
 * Python: `Python updates PPA <https://launchpad.net/~ubuntu-toolchain-r/+archive/ubuntu/python>`__
+
+Crash And Makedumpfile
+~~~~~~~~~~~~~~~~~~~~~~
+
+The crash and makedumpfile source packages may be uploaded according to the
+procedure documented in :ref:`CrashMakedumpfile-Updates <reference_crash_and_makedumpfile_updates>`.
+
